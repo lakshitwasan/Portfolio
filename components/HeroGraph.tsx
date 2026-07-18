@@ -59,15 +59,23 @@ export default function HeroGraph({ lens }: { lens: Lens }) {
       nodes.length = 0;
       const total = Math.max(26, Math.min(96, Math.round((W * H) / 14000)));
       const spacing = Math.sqrt((W * H) / total); // avg distance between nodes
-      LINK = Math.max(120, Math.min(240, spacing * 1.7));
+      // Keep the phone look identical (factor ~1.25 → original ~132px link distance);
+      // ramp up density only as the screen widens toward desktop.
+      const t = Math.min(1, Math.max(0, (W - 500) / 900)); // 0 on phones, 1 on desktops
+      const factor = 1.25 + t * 0.45; // 1.25 → 1.7
+      LINK = Math.max(120, Math.min(240, spacing * factor));
+      // Show more labels as the canvas grows, so it looks full on desktop without
+      // crowding a phone. A shuffled pool varies which terms appear each render.
+      const labelCount = Math.max(7, Math.min(labels.length, Math.round(total * 0.3)));
+      const pool = [...labels].sort(() => Math.random() - 0.5);
       for (let i = 0; i < total; i++) {
         nodes.push({
           x: Math.random() * W,
           y: Math.random() * H,
           vx: (Math.random() - 0.5) * 0.22,
           vy: (Math.random() - 0.5) * 0.22,
-          r: i < labels.length ? 3.2 : 1.4 + Math.random() * 1.6,
-          label: i < labels.length ? labels[i] : undefined,
+          r: i < labelCount ? 3.2 : 1.4 + Math.random() * 1.6,
+          label: i < labelCount ? pool[i] : undefined,
         });
       }
     };
