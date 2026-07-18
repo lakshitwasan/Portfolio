@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design tokens as RGB channel triplets (see tailwind.config.ts).
+  Light theme is the :root default; `.dark` (set by next-themes) overrides.
+  `--accent` is additionally re-bound per lens via [data-lens] so the toggle
+  produces a real, animated color shift across the whole page.
+*/
+:root {
+  --ground: 242 243 246; /* cool off-white so white panels/cards lift off it */
+  --panel: 255 255 255;
+  --line: 214 219 227; /* #D6DBE3 — visible hairline on light */
+  --ink: 20 23 28; /* #14171C */
+  --ink-soft: 84 91 102; /* #545B66 */
+  --success: 26 127 55; /* #1A7F37 */
+  --accent: 20 148 136; /* teal-dark default (ai, light) */
+}
+
+.dark {
+  --ground: 10 13 18; /* #0A0D12 */
+  --panel: 18 22 29; /* #12161D */
+  --line: 34 40 52; /* #222834 */
+  --ink: 233 236 242; /* #E9ECF2 */
+  --ink-soft: 154 162 176; /* #9AA2B0 */
+  --success: 63 185 80; /* #3FB950 */
+  --accent: 53 214 196; /* #35D6C4 */
+}
+
+/* Lens accent bindings — light values */
+[data-lens="ai"] {
+  --accent: 17 141 129;
+}
+[data-lens="backend"] {
+  --accent: 37 99 235;
+} /* blue-600 */
+
+/* Lens accent bindings — dark values */
+.dark [data-lens="ai"] {
+  --accent: 53 214 196;
+} /* #35D6C4 */
+.dark [data-lens="backend"] {
+  --accent: 77 141 255;
+} /* #4D8DFF */
+
+@layer base {
+  * {
+    border-color: rgb(var(--line));
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: rgb(var(--ground));
+    /* Faint "graph paper" dot texture so neither theme reads as flat/empty. */
+    background-image: radial-gradient(rgb(var(--ink) / 0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center top;
+    color: rgb(var(--ink));
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background-color: rgb(var(--accent) / 0.25);
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-content px-6 md:px-8;
+  }
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.16em] text-ink-soft;
+  }
+  .metric-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-panel/60 px-2.5 py-1 font-mono text-[11px] text-ink-soft;
+  }
+  /* Card surface: solid + lifted on light, translucent + flat on dark. */
+  .card-surface {
+    @apply rounded-2xl border border-line bg-panel shadow-card dark:bg-panel/40 dark:shadow-none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
