@@ -52,9 +52,14 @@ export default function HeroGraph({ lens }: { lens: Lens }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    // Node count and link distance both scale with canvas area, so the constellation
+    // looks equally connected on a narrow phone and on an ultrawide monitor.
+    let LINK = 150;
     const seed = () => {
       nodes.length = 0;
-      const total = 26;
+      const total = Math.max(26, Math.min(96, Math.round((W * H) / 14000)));
+      const spacing = Math.sqrt((W * H) / total); // avg distance between nodes
+      LINK = Math.max(120, Math.min(240, spacing * 1.7));
       for (let i = 0; i < total; i++) {
         nodes.push({
           x: Math.random() * W,
@@ -69,8 +74,6 @@ export default function HeroGraph({ lens }: { lens: Lens }) {
 
     resize();
     seed();
-
-    const LINK = 132;
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
